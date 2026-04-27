@@ -257,7 +257,7 @@ export default function Home() {
             <div className="animate-slide-in-left" style={{ animationDelay: '0.2s' }}>
               <div className="photo-frame max-w-md mx-auto md:mx-0">
                 <img 
-                  src="/Nonibirthday/manus-storage/145_cf8b9dc8.jpg" 
+                  src="https://i.postimg.cc/d3h5Q3Br/Snapchat-927302000.jpg" 
                   alt="صورة جميلة معك"
                   loading="lazy"
                   decoding="async"
