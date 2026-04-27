@@ -1,43 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Heart, Sparkles } from 'lucide-react';
 
 /**
- * Design Philosophy: Romantic Luxury
+ * Design Philosophy: Romantic Luxury - Optimized
  * - Soft pink and white palette with delicate gradients
  * - Glassmorphism effects with transparency and blur
- * - Smooth animations and parallax scrolling
+ * - Smooth animations (reduced for performance)
  * - Arabic typography with elegant serif fonts
- * - Floating hearts and sparkle effects
  * - Premium, intimate atmosphere
+ * - Performance optimized: reduced floating elements and animations
  */
 
 export default function Home() {
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [hearts, setHearts] = useState<Array<{ id: number; left: number; delay: number }>>([]);
   const [lovePercentage, setLovePercentage] = useState(0);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Generate floating hearts
-  useEffect(() => {
-    const generatedHearts = Array.from({ length: 15 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      delay: Math.random() * 5,
-    }));
-    setHearts(generatedHearts);
-  }, []);
-
-  // Track scroll progress for animations
+  // Track scroll progress for animations (throttled)
   useEffect(() => {
     const handleScroll = () => {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrolled = window.scrollY;
-      const progress = (scrolled / (documentHeight - windowHeight)) * 100;
-      setScrollProgress(progress);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      scrollTimeoutRef.current = setTimeout(() => {
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        const scrolled = window.scrollY;
+        const progress = (scrolled / (documentHeight - windowHeight)) * 100;
+        setScrollProgress(progress);
+      }, 16); // ~60fps
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
   }, []);
 
   // Animate love percentage on mount
@@ -62,51 +60,16 @@ export default function Home() {
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ direction: 'rtl' }}>
-      {/* Animated background */}
+      {/* Optimized animated background */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-white to-pink-50" />
         
-        {/* Floating hearts background */}
-        {hearts.map((heart) => (
-          <div
-            key={heart.id}
-            className="absolute text-pink-200 opacity-30 animate-pulse"
-            style={{
-              left: `${heart.left}%`,
-              top: '-20px',
-              animation: `float 20s infinite linear`,
-              animationDelay: `${heart.delay}s`,
-              fontSize: `${20 + Math.random() * 20}px`,
-            }}
-          >
-            ❤️
-          </div>
-        ))}
-
-        {/* Soft light orbs */}
-        <div className="absolute top-20 right-10 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }} />
+        {/* Soft light orbs (reduced from 2 to 1 for performance) */}
+        <div className="absolute top-20 right-10 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20" style={{ animation: 'pulse 8s ease-in-out infinite' }} />
       </div>
 
       {/* CSS animations */}
       <style>{`
-        @keyframes float {
-          0% {
-            transform: translateY(0px) translateX(0px);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.5;
-          }
-          90% {
-            opacity: 0.5;
-          }
-          100% {
-            transform: translateY(100vh) translateX(${Math.random() * 100 - 50}px);
-            opacity: 0;
-          }
-        }
-
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -115,17 +78,6 @@ export default function Home() {
           to {
             opacity: 1;
             transform: translateY(0);
-          }
-        }
-
-        @keyframes typewriter {
-          from {
-            width: 0;
-            opacity: 0;
-          }
-          to {
-            width: 100%;
-            opacity: 1;
           }
         }
 
@@ -159,10 +111,31 @@ export default function Home() {
           }
         }
 
-        .animate-typewriter {
-          animation: typewriter 3s steps(50, end) forwards;
-          overflow: hidden;
-          white-space: nowrap;
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(50px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(-50px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        .animate-fadeInUp {
+          animation: fadeInUp 0.8s ease-out forwards;
+          opacity: 0;
         }
 
         .animate-pulse-glow {
@@ -175,6 +148,16 @@ export default function Home() {
 
         .animate-shimmer {
           animation: shimmer 3s ease-in-out infinite;
+        }
+
+        .animate-slide-in-left {
+          animation: slideInLeft 0.8s ease-out forwards;
+          opacity: 0;
+        }
+
+        .animate-slide-in-right {
+          animation: slideInRight 0.8s ease-out forwards;
+          opacity: 0;
         }
 
         .glass-effect {
@@ -190,22 +173,31 @@ export default function Home() {
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
+
+        .photo-frame {
+          position: relative;
+          border-radius: 2rem;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(236, 72, 153, 0.25);
+          border: 3px solid rgba(236, 72, 153, 0.2);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .photo-frame:hover {
+          transform: scale(1.02);
+          box-shadow: 0 30px 80px rgba(236, 72, 153, 0.35);
+        }
+
+        .photo-frame img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
       `}</style>
 
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden">
-        {/* Parallax background */}
-        <div
-          className="absolute inset-0 -z-5"
-          style={{
-            backgroundImage: 'url(https://d2xsxph8kpxj0f.cloudfront.net/310519663605640754/Yd4nUn6pb5YMKgzjLnAxjW/romantic-hero-bg-nUT3mhh3ja35HWQ3sN4Pdj.webp)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            transform: `translateY(${scrollProgress * 0.5}px)`,
-            opacity: 0.6,
-          }}
-        />
-
         <div className="relative z-10 text-center max-w-3xl mx-auto">
           {/* Main heading with animation */}
           <div className="mb-8 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
@@ -218,7 +210,7 @@ export default function Home() {
           {/* Subtitle */}
           <p
             className="text-xl md:text-2xl text-pink-700 mb-12 font-light"
-            style={{ animationDelay: '0.4s' }}
+            style={{ animation: 'fadeInUp 0.8s ease-out 0.4s forwards', opacity: 0 }}
           >
             إلى نوني... البعيدة عن عيني، القريبة من قلبي دائمًا ✨
           </p>
@@ -229,7 +221,8 @@ export default function Home() {
             className="group relative px-8 py-4 text-lg font-semibold text-white rounded-full overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 animate-pulse-glow"
             style={{
               background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
-              animationDelay: '0.6s',
+              animation: 'pulse-glow 2s ease-in-out infinite, fadeInUp 0.8s ease-out 0.6s forwards',
+              opacity: 0,
             }}
           >
             <span className="relative z-10 flex items-center justify-center gap-2">
@@ -239,7 +232,7 @@ export default function Home() {
           </button>
 
           {/* Decorative hearts around button */}
-          <div className="mt-12 flex justify-center gap-4 text-4xl animate-heart-beat">
+          <div className="mt-12 flex justify-center gap-4 text-4xl animate-heart-beat" style={{ animation: 'heartBeat 1.5s ease-in-out infinite, fadeInUp 0.8s ease-out 0.8s forwards', opacity: 0 }}>
             <Heart className="text-pink-400 fill-pink-400" size={32} />
             <Sparkles className="text-pink-300" size={32} />
             <Heart className="text-pink-400 fill-pink-400" size={32} />
@@ -252,51 +245,93 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Photo Section */}
+      <section className="py-20 px-4 relative bg-gradient-to-b from-pink-50 to-white">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-gradient font-display mb-12 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+            لحظة جميلة معك 📸
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            {/* Photo */}
+            <div className="animate-slide-in-left" style={{ animationDelay: '0.2s' }}>
+              <div className="photo-frame max-w-md mx-auto md:mx-0">
+                <img 
+                  src="/manus-storage/145_cf8b9dc8.jpg" 
+                  alt="صورة جميلة معك"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            </div>
+
+            {/* Text content */}
+            <div className="space-y-6 animate-slide-in-right" style={{ animationDelay: '0.3s' }}>
+              <p className="text-xl md:text-2xl text-pink-700 leading-relaxed font-light">
+                في كل لحظة أراك فيها، أشعر بأن الحياة أصبحت أجمل وأكثر معنى.
+              </p>
+              
+              <p className="text-lg md:text-xl text-pink-600 leading-relaxed">
+                ابتسامتك تضيء يومي، وعينك تخبرني قصة حب لا تنتهي.
+              </p>
+
+              <p className="text-lg md:text-xl text-pink-600 leading-relaxed">
+                أتمنى أن تبقي دائمًا بجانبي، تشاركيني كل لحظة، كل ابتسامة، كل شعور.
+              </p>
+
+              <div className="pt-4">
+                <Heart className="text-pink-400 fill-pink-400 animate-heart-beat" size={40} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Message Section */}
       <section
         id="message-section"
-        className="py-20 px-4 relative"
+        className="py-20 px-4 relative bg-white"
       >
         <div className="max-w-4xl mx-auto">
           <div className="glass-effect rounded-3xl p-8 md:p-12 space-y-6 shadow-2xl">
-            <h2 className="text-4xl md:text-5xl font-bold text-center text-gradient font-display mb-8">
+            <h2 className="text-4xl md:text-5xl font-bold text-center text-gradient font-display mb-8 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
               رسالة من القلب 💌
             </h2>
 
             <div className="space-y-6 text-lg md:text-xl leading-relaxed text-gray-800">
-              <p className="animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+              <p className="animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
                 اليوم عيد ميلادك… وأنا بعيد عنك، لكن قلبي أقرب لك من أي وقت مضى 🤍
               </p>
 
-              <p className="animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
+              <p className="animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
                 كل عام وأنت بخير يا أجمل صدفة دخلت حياتي، وكل سنة وأنت ساكنة داخلي مهما بعدت بيننا الطرق والمسافات.
               </p>
 
-              <p className="animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
+              <p className="animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
                 يمكن ما أقدر أكون جنبك اليوم، ولا أشاركك لحظة فرحتك كما أتمنى، لكن إحساسي فيك حاضر، وشوقي لك يوصل لك مع كل نبضة من قلبي.
               </p>
 
-              <p className="animate-fadeInUp" style={{ animationDelay: '0.4s' }}>
+              <p className="animate-fadeInUp" style={{ animationDelay: '0.5s' }}>
                 أدعّي ربي يجمعني بك قريب، وأكون أول شخص يعيد عليك وهو شايف عيونك، مو بس متخيلها من بعيد.
               </p>
 
-              <p className="animate-fadeInUp" style={{ animationDelay: '0.5s' }}>
+              <p className="animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
                 وجودك بحياتي، حتى مع البعد، هو أجمل شيء أملكه، وأنت دائمًا أقرب لي من الجميع.
               </p>
 
-              <p className="animate-fadeInUp" style={{ animationDelay: '0.6s' }}>
+              <p className="animate-fadeInUp" style={{ animationDelay: '0.7s' }}>
                 أحبك أكثر من كل المسافات، وأكثر من كل الكلام اللي ممكن يوصف شعوري.
               </p>
 
-              <p className="animate-fadeInUp" style={{ animationDelay: '0.7s' }}>
+              <p className="animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
                 ولو كان بيدي، لجعلت هذا اليوم عيدين لأنك فيه وُلدتِ.
               </p>
 
-              <p className="animate-fadeInUp" style={{ animationDelay: '0.8s' }}>
+              <p className="animate-fadeInUp" style={{ animationDelay: '0.9s' }}>
                 وفي كل سنة جديدة من عمرك، أتمنى لك فرحًا يليق بقلبك، وراحة تليق بروحك، وحبًا يليق بجمالك.
               </p>
 
-              <p className="animate-fadeInUp text-xl font-semibold text-pink-700" style={{ animationDelay: '0.9s' }}>
+              <p className="animate-fadeInUp text-xl font-semibold text-pink-700" style={{ animationDelay: '1s' }}>
                 وكل عام وأنت قلبي، وروحي، وأجمل ما أهدتني الحياة ❤️🎂✨
               </p>
             </div>
@@ -305,9 +340,9 @@ export default function Home() {
       </section>
 
       {/* Countdown Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-gradient-to-b from-white to-pink-50">
         <div className="max-w-4xl mx-auto">
-          <div className="glass-effect rounded-3xl p-8 md:p-12 text-center">
+          <div className="glass-effect rounded-3xl p-8 md:p-12 text-center animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
             <h2 className="text-4xl md:text-5xl font-bold text-gradient font-display mb-8">
               ⏳ باقي على يومك المميز القادم
             </h2>
@@ -317,45 +352,35 @@ export default function Home() {
       </section>
 
       {/* Love Meter Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-pink-50">
         <div className="max-w-4xl mx-auto">
-          <div
-            className="rounded-3xl p-8 md:p-12 text-center relative overflow-hidden"
-            style={{
-              backgroundImage: 'url(https://d2xsxph8kpxj0f.cloudfront.net/310519663605640754/Yd4nUn6pb5YMKgzjLnAxjW/love-meter-bg-58MCgKXXQnt8LvWFJz2cbs.webp)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
-            <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" />
-            <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-bold text-gradient font-display mb-8">
-                حب لا يعرف المسافة ❤️
-              </h2>
+          <div className="rounded-3xl p-8 md:p-12 text-center glass-effect animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+            <h2 className="text-4xl md:text-5xl font-bold text-gradient font-display mb-8">
+              حب لا يعرف المسافة ❤️
+            </h2>
 
-              <div className="mb-8">
-                <div className="text-6xl font-bold text-pink-600 mb-4">
-                  {lovePercentage}%
-                </div>
-                <div className="w-full bg-pink-100 rounded-full h-6 overflow-hidden shadow-lg">
-                  <div
-                    className="bg-gradient-to-r from-pink-400 to-pink-600 h-full rounded-full transition-all duration-500 ease-out"
-                    style={{ width: `${lovePercentage}%` }}
-                  />
-                </div>
+            <div className="mb-8">
+              <div className="text-6xl font-bold text-pink-600 mb-4">
+                {lovePercentage}%
               </div>
-
-              <p className="text-xl text-pink-700 font-semibold">
-                حب بلا حدود، بلا مسافات، بلا وقت 💕
-              </p>
+              <div className="w-full bg-pink-100 rounded-full h-6 overflow-hidden shadow-lg">
+                <div
+                  className="bg-gradient-to-r from-pink-400 to-pink-600 h-full rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${lovePercentage}%` }}
+                />
+              </div>
             </div>
+
+            <p className="text-xl text-pink-700 font-semibold">
+              حب بلا حدود، بلا مسافات، بلا وقت 💕
+            </p>
           </div>
         </div>
       </section>
 
       {/* Quote Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-3xl mx-auto text-center animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
           <div className="glass-effect rounded-3xl p-12">
             <Sparkles className="mx-auto mb-6 text-pink-400" size={48} />
             <blockquote className="text-3xl md:text-4xl font-light text-pink-800 italic font-display">
@@ -367,9 +392,9 @@ export default function Home() {
       </section>
 
       {/* Ending Section */}
-      <section className="py-20 px-4 relative">
+      <section className="py-20 px-4 relative bg-gradient-to-b from-white to-pink-50">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="space-y-8">
+          <div className="space-y-8 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
             <h2 className="text-5xl md:text-6xl font-bold text-gradient font-display">
               إلى نوني...
             </h2>
@@ -387,24 +412,6 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </div>
-
-        {/* Floating hearts in ending */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {hearts.slice(0, 5).map((heart, idx) => (
-            <div
-              key={`end-${idx}`}
-              className="absolute text-pink-300 text-4xl opacity-40"
-              style={{
-                left: `${20 + idx * 15}%`,
-                bottom: `${10 + idx * 5}%`,
-                animation: `float 15s infinite linear`,
-                animationDelay: `${idx * 0.5}s`,
-              }}
-            >
-              ❤️
-            </div>
-          ))}
         </div>
       </section>
 
