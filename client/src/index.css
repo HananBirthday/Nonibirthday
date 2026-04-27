@@ -43,33 +43,33 @@
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
+  --primary: #ec4899;
+  --primary-foreground: #fdf2f8;
+  --sidebar-primary: #db2777;
+  --sidebar-primary-foreground: #fdf2f8;
+  --chart-1: #fbcfe8;
+  --chart-2: #f472b6;
+  --chart-3: #ec4899;
+  --chart-4: #db2777;
+  --chart-5: #be185d;
   --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.015 65);
-  --secondary: oklch(0.98 0.001 286.375);
-  --secondary-foreground: oklch(0.4 0.015 65);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.141 0.005 285.823);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
+  --background: #fef5f9;
+  --foreground: #3d1f2d;
+  --card: #ffffff;
+  --card-foreground: #3d1f2d;
+  --popover: #ffffff;
+  --popover-foreground: #3d1f2d;
+  --secondary: #fce7f3;
+  --secondary-foreground: #831843;
+  --muted: #fbcfe8;
+  --muted-foreground: #9d174d;
+  --accent: #f472b6;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #fce7f3;
+  --input: #fce7f3;
+  --ring: #ec4899;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.235 0.015 65);
   --sidebar-accent: oklch(0.967 0.001 286.375);
@@ -117,8 +117,23 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Cairo', 'Tajawal', 'Poppins', sans-serif;
+    direction: rtl;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', 'Cairo', serif;
+    font-weight: 700;
+  }
+  .font-amiri {
+    font-family: 'Amiri', serif;
+  }
+  .font-display {
+    font-family: 'Playfair Display', 'Cairo', serif;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
