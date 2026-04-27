@@ -8,16 +8,13 @@ import Home from "./pages/Home";
 
 
 function Router() {
-  const base = "/Nonibirthday";
   return (
-    <WouterRouter base={base}>
-      <Switch>
-        <Route path={"/"} component={Home} />
-        <Route path={"/404"} component={NotFound} />
-        {/* Final fallback route */}
-        <Route component={NotFound} />
-      </Switch>
-    </WouterRouter>
+    <Switch>
+      <Route path="/Nonibirthday/" component={Home} />
+      <Route path="/Nonibirthday" component={Home} />
+      <Route path="/" component={Home} />
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
