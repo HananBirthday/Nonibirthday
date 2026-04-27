@@ -13,7 +13,7 @@ function Router() {
       <Route path="/Nonibirthday/" component={Home} />
       <Route path="/Nonibirthday" component={Home} />
       <Route path="/" component={Home} />
-      <Route component={NotFound} />
+      <Route path="*" component={Home} />
     </Switch>
   );
 }
