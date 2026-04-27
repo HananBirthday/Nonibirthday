@@ -439,12 +439,13 @@ function CountdownTimer() {
 
   useEffect(() => {
     const calculateCountdown = () => {
-      // Calculate next birthday (example: 1 month from now)
+      // Calculate next birthday (April 26)
       const now = new Date();
-      const nextBirthday = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      let nextBirthday = new Date(now.getFullYear(), 3, 26); // April 26
 
+      // If birthday has passed this year, calculate for next year
       if (nextBirthday < now) {
-        nextBirthday.setFullYear(now.getFullYear() + 1);
+        nextBirthday = new Date(now.getFullYear() + 1, 3, 26);
       }
 
       const difference = nextBirthday.getTime() - now.getTime();
